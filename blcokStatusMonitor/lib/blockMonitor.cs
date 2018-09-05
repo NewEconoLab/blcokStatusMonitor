@@ -19,12 +19,11 @@ namespace blcokStatusMonitor.lib
         public JObject isNewBlockInByDB()
         {
             mongodbHelper mh = new mongodbHelper();
-            JArray JA = mh.GetData(mongodbConnStr, mongodbDatabase, "block", "{}", "{index:-1}",2);
+            JArray JA = mh.GetData(mongodbConnStr, mongodbDatabase, "block", "{}", "{index:-1}",1);
 
             long timeDiff = 0;
             var lastBlockTime = (long)JA[0]["time"];
-            var secondLastBlockTime = (long)JA[1]["time"];
-            timeDiff = lastBlockTime - secondLastBlockTime;
+            timeDiff = dateToTimeStamp(DateTime.Now) - lastBlockTime;
 
             //5分钟没有新块
             bool isNewBlockIn = (timeDiff > 300) ? false : true;
@@ -43,6 +42,13 @@ namespace blcokStatusMonitor.lib
             DateTime dt = startTime.AddSeconds(unixTimeStamp);
 
             return dt.ToString("yyyyMMddHHmmss");
+        }
+
+        long dateToTimeStamp(DateTime date)
+        {
+            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1));  // 当地时区
+            long timeStamp = (long)(date - startTime).TotalSeconds; // 相差秒数
+            return timeStamp;
         }
     }
 }
