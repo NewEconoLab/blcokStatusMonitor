@@ -35,17 +35,17 @@ namespace blcokStatusMonitor
             string mongodbDatabase_mainnet = configuration["mongodbDatabase_mainnet"];
 
             bool isDailySend_testnet = false;
-            string blockNotInDay_testnet = string.Empty;
+            string blockNotInHour_testnet = string.Empty;
             bool isDailySend_mainnet = false;
-            string blockNotInDay_mainnet = string.Empty;
+            string blockNotInHour_mainnet = string.Empty;
             Aliyun_SMS aliSMS = new Aliyun_SMS(accessKeyId, accessKeySecret);
             while (true)
             {
                 //监控测试网
-                exeNotify("测试网",mongodbConnStr_testnet, mongodbDatabase_testnet, dailyTime,ref isDailySend_testnet,ref blockNotInDay_testnet, aliSMS, phoneNumbers);
+                exeNotify("测试网",mongodbConnStr_testnet, mongodbDatabase_testnet, dailyTime,ref isDailySend_testnet,ref blockNotInHour_testnet, aliSMS, phoneNumbers);
 
                 //监控主网
-                exeNotify("主网", mongodbConnStr_mainnet, mongodbDatabase_mainnet, dailyTime, ref isDailySend_mainnet, ref blockNotInDay_mainnet, aliSMS, phoneNumbers);
+                exeNotify("主网", mongodbConnStr_mainnet, mongodbDatabase_mainnet, dailyTime, ref isDailySend_mainnet, ref blockNotInHour_mainnet, aliSMS, phoneNumbers);
 
                 //Console.ReadKey();
 
@@ -55,7 +55,7 @@ namespace blcokStatusMonitor
 
         }
 
-        private static void exeNotify(string netType,string mongodbConnStr,string mongodbDatabase,string dailyTime,ref bool isDailySend,ref string blockNotInDay, Aliyun_SMS aliSMS,string phoneNumbers)
+        private static void exeNotify(string netType,string mongodbConnStr,string mongodbDatabase,string dailyTime,ref bool isDailySend,ref string blockNotInHour, Aliyun_SMS aliSMS,string phoneNumbers)
         {
             blockMonitor bm = new blockMonitor(mongodbConnStr, mongodbDatabase);
             var isNewBlockInByDB = bm.isNewBlockInByDB();
@@ -78,14 +78,14 @@ namespace blcokStatusMonitor
             }
             else
             {
-                //每次启动，每天只发一次
-                string today = DateTime.Now.ToString("yyyyMMdd");
-                if (today != blockNotInDay)
+                //每次启动，每小时只发一次
+                string notifyHour = DateTime.Now.ToString("HH");
+                if (notifyHour != blockNotInHour)
                 {
                     var sendSMSResulet = aliSMS.SendSMS_blockNotIn(phoneNumbers, netType, "5分钟", lastBlockIndex, lastBlockTime);
                     Console.WriteLine("》发送入库异常信息状态：" + sendSMSResulet + "|" + DateTime.Now.ToString("yyyy.MM.dd HH:mm"));
 
-                    blockNotInDay = today;
+                    blockNotInHour = notifyHour;
                 }
 
             }
