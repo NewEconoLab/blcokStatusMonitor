@@ -21,7 +21,7 @@ namespace blcokStatusMonitor
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("监控开始");         
+            Console.WriteLine(DateTime.Now + " 监控开始");         
 
             var builder = new ConfigurationBuilder();
             builder.AddJsonFile("keySetting.json");
@@ -36,20 +36,20 @@ namespace blcokStatusMonitor
             string mongodbDatabase_testnet = configuration["mongodbDatabase_testnet"];
             string mongodbConnStr_mainnet = configuration["mongodbConnStr_mainnet"];
             string mongodbDatabase_mainnet = configuration["mongodbDatabase_mainnet"];
-            string TSDB_URL = configuration["TSDB_URL"];
+            //string TSDB_URL = configuration["TSDB_URL"];
 
             bool isDailySend_testnet = false;
             string blockNotInHour_testnet = string.Empty;
             bool isDailySend_mainnet = false;
             string blockNotInHour_mainnet = string.Empty;
             Aliyun_SMS aliSMS = new Aliyun_SMS(accessKeyId, accessKeySecret);
-            Aliyun_TSDB aliyun_TSDB = new Aliyun_TSDB(TSDB_URL);
+            //Aliyun_TSDB aliyun_TSDB = new Aliyun_TSDB(TSDB_URL);
 
 
             while (true)
             {
                 //block时间信息入库
-                insertBlockTime2TSDB(mongodbConnStr_testnet, mongodbDatabase_testnet, aliyun_TSDB,"testnet");
+                //insertBlockTime2TSDB(mongodbConnStr_testnet, mongodbDatabase_testnet, aliyun_TSDB,"testnet");
 
                 //监控测试网
                 exeNotify("测试网",mongodbConnStr_testnet, mongodbDatabase_testnet, dailyTime,ref isDailySend_testnet,ref blockNotInHour_testnet, aliSMS, phoneNumbers);
@@ -59,7 +59,7 @@ namespace blcokStatusMonitor
 
                 //Console.ReadKey();
 
-                Thread.Sleep(500);
+                Thread.Sleep(15*1000);
             }
 
 
@@ -131,7 +131,7 @@ namespace blcokStatusMonitor
 
             }
 
-            Console.WriteLine(netType + "检查无异常");
+            Console.WriteLine(DateTime.Now + " " +netType + "检查无异常");
         }
     }
 }
